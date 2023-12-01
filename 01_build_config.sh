@@ -10,11 +10,11 @@ cat > chopchop/config.json <<-_EOT_
     "PRIMER3": "./primer3_core",
     "BOWTIE": "bowtie/bowtie",
     "TWOBITTOFA": "./twoBitToFa",
-    "TWOBIT_INDEX_DIR": ${CWD}/twoBit_index,
-    "BOWTIE_INDEX_DIR": ${CWD}/bowtie_index,
-    "ISOFORMS_INDEX_DIR": ${CWD}/isoforms,
-    "ISOFORMS_MT_DIR": ${CWD}/isoforms_MT,
-    "GENE_TABLE_INDEX_DIR": ${CWD}/gene_table,
+    "TWOBIT_INDEX_DIR": "${CWD}/twoBit_index",
+    "BOWTIE_INDEX_DIR": "${CWD}/bowtie_index",
+    "ISOFORMS_INDEX_DIR": "${CWD}/isoforms",
+    "ISOFORMS_MT_DIR": "${CWD}/isoforms_MT",
+    "GENE_TABLE_INDEX_DIR": "${CWD}/gene_table"
   },
   "THREADS": 1
 }
