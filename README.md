@@ -67,7 +67,9 @@ genePredToBed MpTak.genePred MpTak.genes.bed
 bedtools getfasta -fi MpTak_v6.1r2.genome.fasta -bed MpTak.genes.bed -nameOnly -s -split -fo MpTak.transcriptome.fa
 bowtie-build MpTak.transcriptome.fa isoforms/MpTak
 ```
-Run Vienna RNA to fold and make MT folder
+
+It isn't clear this is needed at all
+  Run Vienna RNA to fold and make MT folder
 ```bash
 #SBATCH -p short -c 64 --mem 24gb --out rnafold.log
 CPU=64
@@ -98,5 +100,5 @@ OUT=MpTak_chopchop_run
 conda activate /bigdata/gen220/shared/condaenv/chopchop
 cd chopchop
 mkdir -p $OUT
-./chopchop_query.py -G MpTak -o $OUT --genePred_file ../gene_table/MpTak.gene_table --exon 1
+./chopchop_query.py -G MpTak -o $OUT --genePred_file ../gene_table/MpTak.gene_table --exon 1 --scoringMethod DOENCH_2016
 ```
