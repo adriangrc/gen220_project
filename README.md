@@ -54,3 +54,49 @@ bowtie-build MpTak_v6.1r2.genome.fasta bowtie_index/MpTak
 faToTwoBit MpTak_v6.1r2.genome.fasta twoBit_index/MpTak.2bit
 ```
 
+Setup gene table and make transcriptome file
+```bash
+# fix problem with GFF3 file
+perl -i -p -e 's/MapolyID/mapolyID/' MpTak_v6.1r2.gff
+gff3ToGenePred -geneNameAttr=Name MpTak_v6.1r2.gff MpTak.genePred
+# make the gene table
+echo -e "name\tchrom\tstrand\ttxStart\ttxEnd\tcdsStart\tcdsEnd\texonCount\texonStarts\texonEnds\tscore\tname2\tcdsStartStat\tcdsEndStat\texonFrames" > gene_table/MpTak.gene_table
+cat MpTak.genePred >> gene_table/MpTak.gene_table
+# make bedfile 
+genePredToBed MpTak.genePred MpTak.genes.bed
+bedtools getfasta -fi MpTak_v6.1r2.genome.fasta -bed MpTak.genes.bed -nameOnly -s -split -fo MpTak.transcriptome.fa
+bowtie-build MpTak.transcriptome.fa isoforms/MpTak
+```
+Run Vienna RNA to fold and make MT folder
+```bash
+#SBATCH -p short -c 64 --mem 24gb --out rnafold.log
+CPU=64
+module load viennarna
+module load emboos
+# split data into pieces for parallelization
+mkdir -p split
+cd split
+seqretsplit ../MpTak.transcriptome.fa .
+cd ..
+
+mkdir -p RNA_fold
+cd RNA_fold
+parallel -j $CPU RNAplfold \< {} ::: $(ls ../split/*.fasta)
+
+for filename in *.ps; do  
+    perl ../chopchop/mountain.pl < $filename > "../isoforms_MT/$(basename "$filename" _dp.ps).mt"  
+done  
+cd ..
+```
+
+Setup a job for running these - predict sites only in exon 1
+```bash
+#!/usr/bin/bash -l
+#SBATCH -N 1 -n 1 -c 4 --mem 8gb --out chopchop_run.log
+module load miniconda3
+OUT=MpTak_chopchop_run
+conda activate /bigdata/gen220/shared/condaenv/chopchop
+cd chopchop
+mkdir -p $OUT
+./chopchop_query.py -G MpTak -o $OUT --genePred_file ../gene_table/MpTak.gene_table --exon 1
+```
