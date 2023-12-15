@@ -67,7 +67,7 @@ bedtools getfasta -fi MpTak_v6.1r2.genome.fasta -bed MpTak.genes.bed -nameOnly -
 bowtie-build MpTak.transcriptome.fa isoforms/MpTak
 ```
 
-Setup a job for running these - predict sites only in exon 1
+Setup a bash script job for designing sgRNAs to target exon 1
 ```bash
 #!/usr/bin/bash -l
 #SBATCH -N 1 -n 1 -c 4 --mem 8gb --out chopchop_run.log
