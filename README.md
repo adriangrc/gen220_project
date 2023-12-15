@@ -1,6 +1,6 @@
 
 
-#setup high throughput ChopChop runs
+# setup high throughput ChopChop runs
 
  
 ```bash
@@ -12,7 +12,7 @@ conda activate ./chopchop_env
 # activate conda environment each time you want to run chopchop
 ```
 
-# get valen lab scripts to run chopchop/bowtie scripts
+get valen_lab chopchop/bowtie scripts
 ```bash
 git clone https://bitbucket.org/valenlab/chopchop.git
 ```
@@ -20,7 +20,7 @@ Now build up the config file and index folders - this will replace config file w
 ```bash
 # build directories
 mkdir -p bowtie_index twoBit_index gene_table isoforms isoforms_MT
-# change paths
+# change paths for output and retrieval
 CWD=$(realpath .) # get the current path
 cat > chopchop/config.json <<-_EOT_
 {
@@ -38,7 +38,7 @@ cat > chopchop/config.json <<-_EOT_
 }
 _EOT_ 
 ```
-Download some genome data
+Download genomic data
 ```bash
 #obtained genome info from Marpolbase
 curl -O https://marchantia.info/download/MpTak_v6.1r2/MpTak_v6.1r2.gff.gz
@@ -50,14 +50,15 @@ Build indexes
 ```bash
 bowtie-build MpTak_v6.1r2.genome.fasta bowtie_index/MpTak
 faToTwoBit MpTak_v6.1r2.genome.fasta twoBit_index/MpTak.2bit
+#must have similar prefix
 ```
 
 Setup gene table and make transcriptome file
 ```bash
 # fix problem with GFF3 file
 perl -i -p -e 's/MapolyID/mapolyID/' MpTak_v6.1r2.gff
-gff3ToGenePred -geneNameAttr=Name MpTak_v6.1r2.gff MpTak.genePred
-# make the gene table
+gff3ToGenePred -geneNameAttr=Name MpTak_v6.1r2.gff MpTak.genePred # converts annotation file to GenePred
+# make the gene table (needed for building designs for multiple genes)
 echo -e "name\tchrom\tstrand\ttxStart\ttxEnd\tcdsStart\tcdsEnd\texonCount\texonStarts\texonEnds\tscore\tname2\tcdsStartStat\tcdsEndStat\texonFrames" > gene_table/MpTak.gene_table
 cat MpTak.genePred >> gene_table/MpTak.gene_table
 # make bedfile 
